@@ -60,4 +60,8 @@ export class SceneGraph {
 
         return this.visibleSet;
     }
+    public remove(sprite : AnimatedSprite) : void{
+        let index : number = this.animatedSprites.indexOf(sprite);
+        this.animatedSprites.splice(index, 1);
+    }
 }

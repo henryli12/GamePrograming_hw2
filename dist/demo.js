@@ -2026,6 +2026,12 @@ var SceneGraph = function () {
 
             return this.visibleSet;
         }
+    }, {
+        key: "remove",
+        value: function remove(sprite) {
+            var index = this.animatedSprites.indexOf(sprite);
+            this.animatedSprites.splice(index, 1);
+        }
     }]);
 
     return SceneGraph;
@@ -2319,6 +2325,12 @@ var UIController = function () {
         this.mouseUpHandler = function (event) {
             _this.spriteToDrag = null;
         };
+        this.mouseDoubleClickHandler = function (event) {
+            var mousePressX = event.clientX;
+            var mousePressY = event.clientY;
+            var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
+            _this.scene.remove(sprite);
+        };
     }
 
     _createClass(UIController, [{
@@ -2332,6 +2344,7 @@ var UIController = function () {
             canvas.addEventListener("mousedown", this.mouseDownHandler);
             canvas.addEventListener("mousemove", this.mouseMoveHandler);
             canvas.addEventListener("mouseup", this.mouseUpHandler);
+            canvas.addEventListener("dblclick", this.mouseDoubleClickHandler);
         }
     }]);
 

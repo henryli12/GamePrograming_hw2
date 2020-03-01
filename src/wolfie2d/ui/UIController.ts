@@ -22,7 +22,7 @@ export class UIController {
         canvas.addEventListener("mousedown", this.mouseDownHandler);
         canvas.addEventListener("mousemove", this.mouseMoveHandler);
         canvas.addEventListener("mouseup", this.mouseUpHandler);
-        canvas.addEventListener("ondblclick", this.mouseDoubleClickHandler);
+        canvas.addEventListener("dblclick", this.mouseDoubleClickHandler);
     }
 
     public mouseDownHandler = (event : MouseEvent) : void => {
@@ -53,5 +53,9 @@ export class UIController {
         this.spriteToDrag = null;
     }
     public mouseDoubleClickHandler = (event : MouseEvent) : void => {
+        let mousePressX : number = event.clientX;
+        let mousePressY : number = event.clientY;
+        let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
+        this.scene.remove(sprite);
     }
 }

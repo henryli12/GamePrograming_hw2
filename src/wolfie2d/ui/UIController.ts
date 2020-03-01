@@ -23,6 +23,7 @@ export class UIController {
         canvas.addEventListener("mousemove", this.mouseMoveHandler);
         canvas.addEventListener("mouseup", this.mouseUpHandler);
         canvas.addEventListener("dblclick", this.mouseDoubleClickHandler);
+        canvas.addEventListener("mousemove", this.hoverInfo);
     }
 
     public mouseDownHandler = (event : MouseEvent) : void => {
@@ -52,10 +53,27 @@ export class UIController {
     public mouseUpHandler = (event : MouseEvent) : void => {
         this.spriteToDrag = null;
     }
+
     public mouseDoubleClickHandler = (event : MouseEvent) : void => {
         let mousePressX : number = event.clientX;
         let mousePressY : number = event.clientY;
         let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
         this.scene.remove(sprite);
+    }
+
+    public hoverInfo = (event : MouseEvent) : void => {
+        let mousePressX : number = event.clientX;
+        let mousePressY : number = event.clientY;
+        let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
+        if(sprite != null){
+            // let info : string = "position: (" 
+            //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + "\n"
+            //                 +   "State: " + sprite.getState() + ")\n"
+            //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "\n"
+            //                 +   "Frame Count: " + sprite.getFrameCounter();
+            this.scene.setSpirteInfo(sprite.toString());
+        }else{
+            this.scene.setSpirteInfo("");
+        }
     }
 }

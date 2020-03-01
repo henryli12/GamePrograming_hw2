@@ -11,11 +11,13 @@ export class SceneGraph {
     // SCENE GRAPH IS QUITE SIMPLE, SO THIS IS THE SAME AS
     // OUR LIST OF ANIMATED SPRITES
     private visibleSet : Array<SceneObject>;
+    private SpriteInfo : string;
 
     public constructor() {
         // DEFAULT CONSTRUCTOR INITIALIZES OUR DATA STRUCTURES
         this.animatedSprites = new Array();
         this.visibleSet = new Array();
+        this.SpriteInfo = "";
     }
 
     public getNumSprites() : number {
@@ -63,5 +65,11 @@ export class SceneGraph {
     public remove(sprite : AnimatedSprite) : void{
         let index : number = this.animatedSprites.indexOf(sprite);
         this.animatedSprites.splice(index, 1);
+    }
+    public setSpirteInfo(SpriteInfo : string) : void{
+        this.SpriteInfo = SpriteInfo;
+    }
+    public getSpriteInfo() : string{
+        return this.SpriteInfo;
     }
 }

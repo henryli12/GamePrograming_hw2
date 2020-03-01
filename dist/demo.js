@@ -88,8 +88,12 @@ var AnimatedSpriteDemo = function () {
             var numSpritesText = new TextRenderer_1.TextToRender("Num Sprites", "", 20, 50, function () {
                 numSpritesText.text = "Number of Sprites: " + sceneGraph.getNumSprites();
             });
+            var spriteInfo = new TextRenderer_1.TextToRender("Sprite Info", "", 20, 90, function () {
+                spriteInfo.text = game.getSceneGraph().getSpriteInfo();
+            });
             var textRenderer = game.getRenderingSystem().getTextRenderer();
             textRenderer.addTextToRender(numSpritesText);
+            textRenderer.addTextToRender(spriteInfo);
         }
     }]);
 
@@ -1913,6 +1917,7 @@ var SceneGraph = function () {
         // DEFAULT CONSTRUCTOR INITIALIZES OUR DATA STRUCTURES
         this.animatedSprites = new Array();
         this.visibleSet = new Array();
+        this.SpriteInfo = "";
     }
 
     _createClass(SceneGraph, [{
@@ -2031,6 +2036,16 @@ var SceneGraph = function () {
         value: function remove(sprite) {
             var index = this.animatedSprites.indexOf(sprite);
             this.animatedSprites.splice(index, 1);
+        }
+    }, {
+        key: "setSpirteInfo",
+        value: function setSpirteInfo(SpriteInfo) {
+            this.SpriteInfo = SpriteInfo;
+        }
+    }, {
+        key: "getSpriteInfo",
+        value: function getSpriteInfo() {
+            return this.SpriteInfo;
         }
     }]);
 
@@ -2194,7 +2209,7 @@ var AnimatedSprite = function (_SceneObject_1$SceneO) {
     }, {
         key: "toString",
         value: function toString() {
-            var summary = "{ position: (" + this.getPosition().getX() + ", " + this.getPosition().getY() + ") " + "(state: " + this.getState() + ") " + "(animationFrameIndex: " + this.getAnimationFrameIndex() + ") " + "(frameCounter: " + this.getFrameCounter() + ") ";
+            var summary = "position: (" + this.getPosition().getX() + ", " + this.getPosition().getY() + ") " + "(state: " + this.getState() + ") " + "(animationFrameIndex: " + this.getAnimationFrameIndex() + ") " + "(frameCounter: " + this.getFrameCounter() + ") ";
             return summary;
         }
     }]);
@@ -2331,6 +2346,21 @@ var UIController = function () {
             var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
             _this.scene.remove(sprite);
         };
+        this.hoverInfo = function (event) {
+            var mousePressX = event.clientX;
+            var mousePressY = event.clientY;
+            var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
+            if (sprite != null) {
+                // let info : string = "position: (" 
+                //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + "\n"
+                //                 +   "State: " + sprite.getState() + ")\n"
+                //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "\n"
+                //                 +   "Frame Count: " + sprite.getFrameCounter();
+                _this.scene.setSpirteInfo(sprite.toString());
+            } else {
+                _this.scene.setSpirteInfo("");
+            }
+        };
     }
 
     _createClass(UIController, [{
@@ -2345,6 +2375,7 @@ var UIController = function () {
             canvas.addEventListener("mousemove", this.mouseMoveHandler);
             canvas.addEventListener("mouseup", this.mouseUpHandler);
             canvas.addEventListener("dblclick", this.mouseDoubleClickHandler);
+            canvas.addEventListener("mousemove", this.hoverInfo);
         }
     }]);
 

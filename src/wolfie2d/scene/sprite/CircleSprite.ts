@@ -30,4 +30,10 @@ export class CircleSprite extends SceneObject {
     public getColor() : Vector3{
         return this.color;
     }
+    public getWidth() : number{
+        return this.width;
+    }
+    public getHeight() : number{
+        return this.height;
+    }
 }

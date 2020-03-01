@@ -6,6 +6,7 @@ import {AnimatedSprite} from '../scene/sprite/AnimatedSprite'
 import {AnimatedSpriteType} from '../scene/sprite/AnimatedSpriteType'
 import {WebGLGameTexture} from './WebGLGameTexture'
 import {HashTable} from '../data/HashTable'
+import { CircleSprite } from '../scene/sprite/CircleSprite'
 
 var SpriteDefaults = {
     A_POSITION: "a_Position",
@@ -105,7 +106,17 @@ export class CircleRenderer {
             this.webGLUniformLocations[locationName] = location;
         }
     }
-    private renderCicle(){
+    private renderCicle(webGL : WebGLRenderingContext, canvasWidth : number,
+                    canvasHeight : number, circle : CircleSprite){
+        let circleWidth : number = circle.getWidth();
+        let circleHeight : number = circle.getHeight();
+        let circleXInPixels : number = circle.getPosition().getX() + (circleWidth/2);
+        let circleYInPixels : number = circle.getPosition().getY() + (circleHeight/2);
+        let circleXTranslate : number = (circleXInPixels - (canvasWidth/2))/(canvasWidth/2);
+        let circleYTranslate : number = (circleYInPixels - (canvasHeight/2))/(canvasHeight/2);
+        this.spriteTranslate.setX(circleXTranslate);
+        this.spriteTranslate.setY(-circleYTranslate);
+
         
     }
 }

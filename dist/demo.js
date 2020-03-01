@@ -2344,7 +2344,9 @@ var UIController = function () {
             var mousePressX = event.clientX;
             var mousePressY = event.clientY;
             var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
-            _this.scene.remove(sprite);
+            if (sprite != null) {
+                _this.scene.remove(sprite);
+            }
         };
         this.hoverInfo = function (event) {
             var mousePressX = event.clientX;

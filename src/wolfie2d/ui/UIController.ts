@@ -58,7 +58,9 @@ export class UIController {
         let mousePressX : number = event.clientX;
         let mousePressY : number = event.clientY;
         let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
-        this.scene.remove(sprite);
+        if(sprite != null){
+            this.scene.remove(sprite);
+        }
     }
 
     public hoverInfo = (event : MouseEvent) : void => {

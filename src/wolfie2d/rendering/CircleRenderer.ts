@@ -54,6 +54,9 @@ export class CircleRenderer {
         var fragmentShaderSource =
             'precision highp float;\n'+
             'varying vec2 val;\n'+
+            'uniform float u_r;\n'+
+            'uniform float u_g;\n'+
+            'uniform float u_b;\n'+
             'void main() {\n'+
             '    float R = 0.5;\n'+
             '    float dist = sqrt(dot(val,val));\n'+
@@ -61,8 +64,15 @@ export class CircleRenderer {
             '    if (dist > R) {\n'+
             '        discard;\n'+
             '    }\n'+
-            '    gl_FragColor =\n'+ 
-            '    vec4(1.0, 0.0, dist, alpha);\n'+
+            '    if (u_r == 0.0){\n'+
+            '        gl_FragColor = vec4(dist, u_g, u_b, alpha);\n'+
+            '    }\n'+
+            '    if(u_g == 0.0){\n'+
+            '        gl_FragColor = vec4(u_r, dist, u_b, alpha);\n'+
+            '    }\n'+
+            '    if(u_b == 0.0){\n'+
+            '        gl_FragColor = vec4(u_r, u_g, dist, alpha);\n'+
+            '    }\n'+
             '}\n'
         
         this.shader.init(webGL, vertexShaderSource, fragmentShaderSource);
@@ -86,7 +96,7 @@ export class CircleRenderer {
         this.webGLAttributeLocations = {};
         this.webGLUniformLocations = {};
         this.loadAttributeLocations(webGL, ["a_Position", "a_ValueToInterpolate"]);
-        this.loadUniformLocations(webGL, ["u_SpriteTransform"]);
+        this.loadUniformLocations(webGL, ["u_SpriteTransform", "u_r", "u_g", "u_b"]);
 
         // WE'LL USE THESE FOR TRANSOFMRING OBJECTS WHEN WE DRAW THEM
         this.spriteTransform = new Matrix(4, 4);
@@ -141,6 +151,12 @@ export class CircleRenderer {
 
         let u_SpriteTransform : WebGLUniformLocation = this.webGLUniformLocations["u_SpriteTransform"];
         webGL.uniformMatrix4fv(u_SpriteTransform, false, this.spriteTransform.getData());
+        let u_r : WebGLUniformLocation = this.webGLUniformLocations["u_r"];
+        webGL.uniform1f(u_r, circle.getR());
+        let u_g : WebGLUniformLocation = this.webGLUniformLocations["u_g"];
+        webGL.uniform1f(u_g, circle.getG());
+        let u_b : WebGLUniformLocation = this.webGLUniformLocations["u_b"];
+        webGL.uniform1f(u_b, circle.getB());
 
 
         // DRAW THE SPRITE AS A TRIANGLE STRIP USING 4 VERTICES, STARTING AT THE START OF THE ARRAY (index 0)

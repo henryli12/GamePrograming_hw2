@@ -3,7 +3,9 @@
  */
 import {AnimatedSprite} from "../scene/sprite/AnimatedSprite"
 import {SceneGraph} from "../scene/SceneGraph"
-import { CircleSprite } from "../scene/sprite/CircleSprite";
+import { CircleSprite } from "../scene/sprite/CircleSprite"
+import { ResourceManager } from "../files/ResourceManager"
+import {AnimatedSpriteType} from '../scene/sprite/AnimatedSpriteType';
 
 export class UIController {
     private spriteToDrag : AnimatedSprite;
@@ -11,14 +13,16 @@ export class UIController {
     private scene : SceneGraph;
     private dragOffsetX : number;
     private dragOffsetY : number;
+    private resourceManager : ResourceManager;
 
     public constructor() {}
 
-    public init(canvasId : string, initScene : SceneGraph) : void {
+    public init(canvasId : string, initScene : SceneGraph, resourceManager : ResourceManager) : void {
         this.spriteToDrag = null;
         this.scene = initScene;
         this.dragOffsetX = -1;
         this.dragOffsetY = -1;
+        this.resourceManager = resourceManager;
 
         let canvas : HTMLCanvasElement = <HTMLCanvasElement>document.getElementById(canvasId);
         canvas.addEventListener("mousedown", this.mouseDownHandler);
@@ -47,14 +51,25 @@ export class UIController {
             this.dragOffsetY = circle.getPosition().getY() - mousePressY;
         }else{
             let i : number = Math.floor(Math.random()*3);
+            console.log(i);
             if (i === 2){
                 let circle : CircleSprite = new CircleSprite();
-                circle.getPosition().set(event.clientX, event.clientY, 0.0, 1.0);
+                circle.getPosition().set(event.clientX - (256 / 2), event.clientY - (256 / 2), 0.0, 1.0);
                 this.scene.addCircleSprite(circle);
             }else{
-                // let spriteTypeToUse : string = DEMO_SPRITE_TYPES[i];
-                // let animatedSpriteType : AnimatedSpriteType = resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
-                // let spriteToAdd : AnimatedSprite = new AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+                const DEMO_SPRITE_TYPES : string[] = [
+                    'resources/animated_sprites/RedCircleMan.json',
+                    'resources/animated_sprites/MultiColorBlock.json'
+                ];
+                const DEMO_SPRITE_STATES = {
+                    FORWARD_STATE: 'FORWARD',
+                    REVERSE_STATE: 'REVERSE'
+                };
+                let spriteTypeToUse : string = DEMO_SPRITE_TYPES[i];
+                let animatedSpriteType : AnimatedSpriteType = this.resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
+                let spriteToAdd : AnimatedSprite = new AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+                spriteToAdd.getPosition().set(event.clientX - (256 / 2), event.clientY - (256 / 2), 0.0, 1.0);
+                this.scene.addAnimatedSprite(spriteToAdd);
             }
         }
     }
@@ -96,22 +111,8 @@ export class UIController {
         let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
         let circle : CircleSprite = this.scene.getCircleAt(mousePressX, mousePressY);
         if(sprite != null){
-            // let info : string = "position: (" 
-            //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
-            //                 +   "State: " + sprite.getState() + "   "
-            //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
-            //                 +   "Frame Count: " + sprite.getFrameCounter();
-            // this.scene.setSpirteInfo(info);
             this.scene.setSpriteHover(sprite);
         }else if(circle != null){
-            // let color : string = circle.getColor().toString();
-            // let colorrbg : Array<string> = color.split(",");
-            // colorrbg.splice(-1, 1);
-            // color = colorrbg.join(",");
-            // let info : string = "position: ("
-            //                 +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
-            //                 +   "Color: " + color;
-            // this.scene.setSpirteInfo(info);
             this.scene.setSpriteHover(circle);
         }else{
             this.scene.setSpriteHover(null);

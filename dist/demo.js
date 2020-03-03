@@ -105,11 +105,7 @@ var AnimatedSpriteDemo = function () {
                     spriteInfo.text = info;
                 } else {
                     var circle = sprite;
-                    var color = circle.getColor().toString();
-                    var colorrbg = color.split(",");
-                    colorrbg.splice(-1, 1);
-                    color = colorrbg.join(",");
-                    var _info = "position: (" + circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   " + "Color: " + color;
+                    var _info = "position: (" + circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   " + "R: " + circle.getR() + "   G: " + circle.getG() + "   B:" + circle.getB();
                     spriteInfo.text = _info;
                 }
             });
@@ -192,7 +188,7 @@ var Game = function (_GameLoopTemplate_1$G) {
         key: "init",
         value: function init(gameCanvasId, textCanvasId) {
             this.renderingSystem.init(gameCanvasId, textCanvasId);
-            this.uiController.init(gameCanvasId, this.sceneGraph);
+            this.uiController.init(gameCanvasId, this.sceneGraph, this.resourceManager);
         }
     }, {
         key: "begin",
@@ -1491,7 +1487,7 @@ var CircleRenderer = function () {
         value: function init(webGL) {
             this.shader = new WebGLGameShader_1.WebGLGameShader();
             var vertexShaderSource = 'precision highp float;\n' + 'attribute vec4 a_Position;\n' + 'attribute vec2 a_ValueToInterpolate;\n' + 'varying vec2 val;\n' + 'uniform mat4 u_SpriteTransform;\n' + 'void main() {\n' + '    val = a_ValueToInterpolate;\n' + '    gl_Position = u_SpriteTransform\n' + '            * a_Position;\n' + '}\n';
-            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'void main() {\n' + '    float R = 0.5;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    gl_FragColor =\n' + '    vec4(1.0, 0.0, dist, alpha);\n' + '}\n';
+            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'uniform float u_r;\n' + 'uniform float u_g;\n' + 'uniform float u_b;\n' + 'void main() {\n' + '    float R = 0.5;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    if (u_r == 0.0){\n' + '        gl_FragColor = vec4(dist, u_g, u_b, alpha);\n' + '    }\n' + '    if(u_g == 0.0){\n' + '        gl_FragColor = vec4(u_r, dist, u_b, alpha);\n' + '    }\n' + '    if(u_b == 0.0){\n' + '        gl_FragColor = vec4(u_r, u_g, dist, alpha);\n' + '    }\n' + '}\n';
             this.shader.init(webGL, vertexShaderSource, fragmentShaderSource);
             // GET THE webGL OBJECT TO USE
             var verticesTexCoords = new Float32Array([-0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5]);
@@ -1505,7 +1501,7 @@ var CircleRenderer = function () {
             this.webGLAttributeLocations = {};
             this.webGLUniformLocations = {};
             this.loadAttributeLocations(webGL, ["a_Position", "a_ValueToInterpolate"]);
-            this.loadUniformLocations(webGL, ["u_SpriteTransform"]);
+            this.loadUniformLocations(webGL, ["u_SpriteTransform", "u_r", "u_g", "u_b"]);
             // WE'LL USE THESE FOR TRANSOFMRING OBJECTS WHEN WE DRAW THEM
             this.spriteTransform = new Matrix_1.Matrix(4, 4);
             this.spriteTranslate = new Vector3_1.Vector3();
@@ -1558,6 +1554,12 @@ var CircleRenderer = function () {
             webGL.enableVertexAttribArray(a_ValueToInterpolate);
             var u_SpriteTransform = this.webGLUniformLocations["u_SpriteTransform"];
             webGL.uniformMatrix4fv(u_SpriteTransform, false, this.spriteTransform.getData());
+            var u_r = this.webGLUniformLocations["u_r"];
+            webGL.uniform1f(u_r, circle.getR());
+            var u_g = this.webGLUniformLocations["u_g"];
+            webGL.uniform1f(u_g, circle.getG());
+            var u_b = this.webGLUniformLocations["u_b"];
+            webGL.uniform1f(u_b, circle.getB());
             // DRAW THE SPRITE AS A TRIANGLE STRIP USING 4 VERTICES, STARTING AT THE START OF THE ARRAY (index 0)
             webGL.drawArrays(webGL.TRIANGLE_STRIP, SpriteDefaults.INDEX_OF_FIRST_VERTEX, SpriteDefaults.NUM_VERTICES);
         }
@@ -2568,9 +2570,13 @@ var CircleSprite = function (_SceneObject_1$SceneO) {
 
         var _this = _possibleConstructorReturn(this, (CircleSprite.__proto__ || Object.getPrototypeOf(CircleSprite)).call(this));
 
+        _this.colors = [[255.0, 0.0, 0.0], [0.0, 255.0, 0.0], [0.0, 0.0, 255.0], [255.0, 255.0, 0.0], [0.0, 255.0, 255.0], [255.0, 0.0, 255.0]];
+        var index = Math.floor(Math.random() * 6);
         _this.width = 256;
         _this.height = 256;
-        _this.color = [255.0, 255.0, 255.0, 1.0];
+        _this.r_value = _this.colors[index][0];
+        _this.g_value = _this.colors[index][1];
+        _this.b_value = _this.colors[index][2];
         return _this;
     }
 
@@ -2590,9 +2596,9 @@ var CircleSprite = function (_SceneObject_1$SceneO) {
             }
         }
     }, {
-        key: "getColor",
-        value: function getColor() {
-            return this.color;
+        key: "getColors",
+        value: function getColors() {
+            return this.colors;
         }
     }, {
         key: "getWidth",
@@ -2603,6 +2609,21 @@ var CircleSprite = function (_SceneObject_1$SceneO) {
         key: "getHeight",
         value: function getHeight() {
             return this.height;
+        }
+    }, {
+        key: "getR",
+        value: function getR() {
+            return this.r_value;
+        }
+    }, {
+        key: "getG",
+        value: function getG() {
+            return this.g_value;
+        }
+    }, {
+        key: "getB",
+        value: function getB() {
+            return this.b_value;
         }
     }]);
 
@@ -2619,6 +2640,10 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
+/*
+ * This provides responses to UI input.
+ */
+var AnimatedSprite_1 = require("../scene/sprite/AnimatedSprite");
 var CircleSprite_1 = require("../scene/sprite/CircleSprite");
 
 var UIController = function () {
@@ -2646,14 +2671,22 @@ var UIController = function () {
                 _this.dragOffsetY = circle.getPosition().getY() - mousePressY;
             } else {
                 var i = Math.floor(Math.random() * 3);
+                console.log(i);
                 if (i === 2) {
                     var _circle = new CircleSprite_1.CircleSprite();
-                    _circle.getPosition().set(event.clientX, event.clientY, 0.0, 1.0);
+                    _circle.getPosition().set(event.clientX - 256 / 2, event.clientY - 256 / 2, 0.0, 1.0);
                     _this.scene.addCircleSprite(_circle);
                 } else {
-                    // let spriteTypeToUse : string = DEMO_SPRITE_TYPES[i];
-                    // let animatedSpriteType : AnimatedSpriteType = resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
-                    // let spriteToAdd : AnimatedSprite = new AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+                    var DEMO_SPRITE_TYPES = ['resources/animated_sprites/RedCircleMan.json', 'resources/animated_sprites/MultiColorBlock.json'];
+                    var DEMO_SPRITE_STATES = {
+                        FORWARD_STATE: 'FORWARD',
+                        REVERSE_STATE: 'REVERSE'
+                    };
+                    var spriteTypeToUse = DEMO_SPRITE_TYPES[i];
+                    var animatedSpriteType = _this.resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
+                    var spriteToAdd = new AnimatedSprite_1.AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+                    spriteToAdd.getPosition().set(event.clientX - 256 / 2, event.clientY - 256 / 2, 0.0, 1.0);
+                    _this.scene.addAnimatedSprite(spriteToAdd);
                 }
             }
         };
@@ -2685,22 +2718,8 @@ var UIController = function () {
             var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
             var circle = _this.scene.getCircleAt(mousePressX, mousePressY);
             if (sprite != null) {
-                // let info : string = "position: (" 
-                //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
-                //                 +   "State: " + sprite.getState() + "   "
-                //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
-                //                 +   "Frame Count: " + sprite.getFrameCounter();
-                // this.scene.setSpirteInfo(info);
                 _this.scene.setSpriteHover(sprite);
             } else if (circle != null) {
-                // let color : string = circle.getColor().toString();
-                // let colorrbg : Array<string> = color.split(",");
-                // colorrbg.splice(-1, 1);
-                // color = colorrbg.join(",");
-                // let info : string = "position: ("
-                //                 +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
-                //                 +   "Color: " + color;
-                // this.scene.setSpirteInfo(info);
                 _this.scene.setSpriteHover(circle);
             } else {
                 _this.scene.setSpriteHover(null);
@@ -2710,11 +2729,12 @@ var UIController = function () {
 
     _createClass(UIController, [{
         key: "init",
-        value: function init(canvasId, initScene) {
+        value: function init(canvasId, initScene, resourceManager) {
             this.spriteToDrag = null;
             this.scene = initScene;
             this.dragOffsetX = -1;
             this.dragOffsetY = -1;
+            this.resourceManager = resourceManager;
             var canvas = document.getElementById(canvasId);
             canvas.addEventListener("mousedown", this.mouseDownHandler);
             canvas.addEventListener("mousemove", this.mouseMoveHandler);
@@ -2729,6 +2749,6 @@ var UIController = function () {
 
 exports.UIController = UIController;
 
-},{"../scene/sprite/CircleSprite":18}]},{},[1])
+},{"../scene/sprite/AnimatedSprite":16,"../scene/sprite/CircleSprite":18}]},{},[1])
 
 //# sourceMappingURL=demo.js.map

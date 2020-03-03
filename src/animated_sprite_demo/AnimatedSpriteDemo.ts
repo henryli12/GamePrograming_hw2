@@ -108,13 +108,9 @@ class AnimatedSpriteDemo {
                 spriteInfo.text = info;
             }else{
                 let circle : CircleSprite = <CircleSprite>sprite;
-                let color : string = circle.getColor().toString();
-                let colorrbg : Array<string> = color.split(",");
-                colorrbg.splice(-1, 1);
-                color = colorrbg.join(",");
                 let info : string = "position: ("
                                 +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
-                                +   "Color: " + color;
+                                +   "R: " + circle.getR() + "   G: " + circle.getG() + "   B:" + circle.getB();
                 spriteInfo.text = info;
             }
         });

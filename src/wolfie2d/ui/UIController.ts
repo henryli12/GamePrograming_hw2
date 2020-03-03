@@ -45,6 +45,17 @@ export class UIController {
             this.circleToDrag = circle;
             this.dragOffsetX = circle.getPosition().getX() - mousePressX;
             this.dragOffsetY = circle.getPosition().getY() - mousePressY;
+        }else{
+            let i : number = Math.floor(Math.random()*3);
+            if (i === 2){
+                let circle : CircleSprite = new CircleSprite();
+                circle.getPosition().set(event.clientX, event.clientY, 0.0, 1.0);
+                this.scene.addCircleSprite(circle);
+            }else{
+                // let spriteTypeToUse : string = DEMO_SPRITE_TYPES[i];
+                // let animatedSpriteType : AnimatedSpriteType = resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
+                // let spriteToAdd : AnimatedSprite = new AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+            }
         }
     }
     
@@ -85,23 +96,25 @@ export class UIController {
         let sprite : AnimatedSprite = this.scene.getSpriteAt(mousePressX, mousePressY);
         let circle : CircleSprite = this.scene.getCircleAt(mousePressX, mousePressY);
         if(sprite != null){
-            let info : string = "position: (" 
-                            +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
-                            +   "State: " + sprite.getState() + "   "
-                            +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
-                            +   "Frame Count: " + sprite.getFrameCounter();
-            this.scene.setSpirteInfo(info);
+            // let info : string = "position: (" 
+            //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
+            //                 +   "State: " + sprite.getState() + "   "
+            //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
+            //                 +   "Frame Count: " + sprite.getFrameCounter();
+            // this.scene.setSpirteInfo(info);
+            this.scene.setSpriteHover(sprite);
         }else if(circle != null){
-            let color : string = circle.getColor().toString();
-            let colorrbg : Array<string> = color.split(",");
-            colorrbg.splice(-1, 1);
-            color = colorrbg.join(",");
-            let info : string = "position: ("
-                            +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
-                            +   "Color: " + color;
-            this.scene.setSpirteInfo(info);
+            // let color : string = circle.getColor().toString();
+            // let colorrbg : Array<string> = color.split(",");
+            // colorrbg.splice(-1, 1);
+            // color = colorrbg.join(",");
+            // let info : string = "position: ("
+            //                 +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
+            //                 +   "Color: " + color;
+            // this.scene.setSpirteInfo(info);
+            this.scene.setSpriteHover(circle);
         }else{
-            this.scene.setSpirteInfo("");
+            this.scene.setSpriteHover(null);
         }
     }
 }

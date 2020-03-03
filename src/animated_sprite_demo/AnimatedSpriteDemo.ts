@@ -12,6 +12,7 @@ import {SceneGraph} from '../wolfie2d/scene/SceneGraph'
 import {AnimatedSprite} from '../wolfie2d/scene/sprite/AnimatedSprite'
 import {AnimatedSpriteType} from '../wolfie2d/scene/sprite/AnimatedSpriteType'
 import { CircleSprite } from '../wolfie2d/scene/sprite/CircleSprite'
+import { SceneObject } from '../wolfie2d/scene/SceneObject'
 
 // IN THIS EXAMPLE WE'LL HAVE 2 SPRITE TYPES THAT EACH HAVE THE SAME 2 STATES
 // AND WHERE EACH SPRITE TYPE HAS ITS OWN SPRITE SHEET
@@ -95,7 +96,27 @@ class AnimatedSpriteDemo {
             numSpritesText.text = "Number of Sprites: " + sceneGraph.getNumSprites();
         });
         let spriteInfo = new TextToRender("Sprite Info", "", 20, 70, function(){
-            spriteInfo.text = game.getSceneGraph().getSpriteInfo();
+            let sprite : SceneObject = game.getSceneGraph().getSpriteHover();
+            if (sprite === null){
+                spriteInfo.text = "";
+            }else if(sprite instanceof AnimatedSprite){
+                let info : string = "position: (" 
+                +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
+                +   "State: " + sprite.getState() + "   "
+                +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
+                +   "Frame Count: " + sprite.getFrameCounter();
+                spriteInfo.text = info;
+            }else{
+                let circle : CircleSprite = <CircleSprite>sprite;
+                let color : string = circle.getColor().toString();
+                let colorrbg : Array<string> = color.split(",");
+                colorrbg.splice(-1, 1);
+                color = colorrbg.join(",");
+                let info : string = "position: ("
+                                +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
+                                +   "Color: " + color;
+                spriteInfo.text = info;
+            }
         });
         let textRenderer = game.getRenderingSystem().getTextRenderer();
         textRenderer.addTextToRender(numSpritesText);

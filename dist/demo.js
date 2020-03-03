@@ -97,7 +97,21 @@ var AnimatedSpriteDemo = function () {
                 numSpritesText.text = "Number of Sprites: " + sceneGraph.getNumSprites();
             });
             var spriteInfo = new TextRenderer_1.TextToRender("Sprite Info", "", 20, 70, function () {
-                spriteInfo.text = game.getSceneGraph().getSpriteInfo();
+                var sprite = game.getSceneGraph().getSpriteHover();
+                if (sprite === null) {
+                    spriteInfo.text = "";
+                } else if (sprite instanceof AnimatedSprite_1.AnimatedSprite) {
+                    var info = "position: (" + sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   " + "State: " + sprite.getState() + "   " + "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   " + "Frame Count: " + sprite.getFrameCounter();
+                    spriteInfo.text = info;
+                } else {
+                    var circle = sprite;
+                    var color = circle.getColor().toString();
+                    var colorrbg = color.split(",");
+                    colorrbg.splice(-1, 1);
+                    color = colorrbg.join(",");
+                    var _info = "position: (" + circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   " + "Color: " + color;
+                    spriteInfo.text = _info;
+                }
             });
             var textRenderer = game.getRenderingSystem().getTextRenderer();
             textRenderer.addTextToRender(numSpritesText);
@@ -1456,9 +1470,6 @@ var SpriteDefaults = {
     A_POSITION: "a_Position",
     A_TEX_COORD: "a_TexCoord",
     U_SPRITE_TRANSFORM: "u_SpriteTransform",
-    U_TEX_COORD_FACTOR: "u_TexCoordFactor",
-    U_TEX_COORD_SHIFT: "u_TexCoordShift",
-    U_SAMPLER: "u_Sampler",
     NUM_VERTICES: 4,
     FLOATS_PER_VERTEX: 2,
     FLOATS_PER_TEXTURE_COORDINATE: 2,
@@ -1480,7 +1491,7 @@ var CircleRenderer = function () {
         value: function init(webGL) {
             this.shader = new WebGLGameShader_1.WebGLGameShader();
             var vertexShaderSource = 'precision highp float;\n' + 'attribute vec4 a_Position;\n' + 'attribute vec2 a_ValueToInterpolate;\n' + 'varying vec2 val;\n' + 'uniform mat4 u_SpriteTransform;\n' + 'void main() {\n' + '    val = a_ValueToInterpolate;\n' + '    gl_Position = u_SpriteTransform\n' + '            * a_Position;\n' + '}\n';
-            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'void main() {\n' + '    float R = 0.5;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    gl_FragColor =\n' + '    vec4(1.0, 1.0, dist, alpha);\n' + '}\n';
+            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'void main() {\n' + '    float R = 0.5;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    gl_FragColor =\n' + '    vec4(1.0, 0.0, dist, alpha);\n' + '}\n';
             this.shader.init(webGL, vertexShaderSource, fragmentShaderSource);
             // GET THE webGL OBJECT TO USE
             var verticesTexCoords = new Float32Array([-0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5]);
@@ -2079,7 +2090,7 @@ var SceneGraph = function () {
         this.animatedSprites = new Array();
         this.circleSprites = new Array();
         this.visibleSet = new Array();
-        this.SpriteInfo = "";
+        this.spriteHover = null;
     }
 
     _createClass(SceneGraph, [{
@@ -2270,14 +2281,14 @@ var SceneGraph = function () {
             this.circleSprites.splice(index, 1);
         }
     }, {
-        key: "setSpirteInfo",
-        value: function setSpirteInfo(SpriteInfo) {
-            this.SpriteInfo = SpriteInfo;
+        key: "setSpriteHover",
+        value: function setSpriteHover(spriteHover) {
+            this.spriteHover = spriteHover;
         }
     }, {
-        key: "getSpriteInfo",
-        value: function getSpriteInfo() {
-            return this.SpriteInfo;
+        key: "getSpriteHover",
+        value: function getSpriteHover() {
+            return this.spriteHover;
         }
     }]);
 
@@ -2608,6 +2619,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 Object.defineProperty(exports, "__esModule", { value: true });
+var CircleSprite_1 = require("../scene/sprite/CircleSprite");
 
 var UIController = function () {
     function UIController() {
@@ -2632,6 +2644,17 @@ var UIController = function () {
                 _this.circleToDrag = circle;
                 _this.dragOffsetX = circle.getPosition().getX() - mousePressX;
                 _this.dragOffsetY = circle.getPosition().getY() - mousePressY;
+            } else {
+                var i = Math.floor(Math.random() * 3);
+                if (i === 2) {
+                    var _circle = new CircleSprite_1.CircleSprite();
+                    _circle.getPosition().set(event.clientX, event.clientY, 0.0, 1.0);
+                    _this.scene.addCircleSprite(_circle);
+                } else {
+                    // let spriteTypeToUse : string = DEMO_SPRITE_TYPES[i];
+                    // let animatedSpriteType : AnimatedSpriteType = resourceManager.getAnimatedSpriteTypeById(spriteTypeToUse);
+                    // let spriteToAdd : AnimatedSprite = new AnimatedSprite(animatedSpriteType, DEMO_SPRITE_STATES.FORWARD_STATE);
+                }
             }
         };
         this.mouseMoveHandler = function (event) {
@@ -2662,17 +2685,25 @@ var UIController = function () {
             var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
             var circle = _this.scene.getCircleAt(mousePressX, mousePressY);
             if (sprite != null) {
-                var info = "position: (" + sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   " + "State: " + sprite.getState() + "   " + "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   " + "Frame Count: " + sprite.getFrameCounter();
-                _this.scene.setSpirteInfo(info);
+                // let info : string = "position: (" 
+                //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   "
+                //                 +   "State: " + sprite.getState() + "   "
+                //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   "
+                //                 +   "Frame Count: " + sprite.getFrameCounter();
+                // this.scene.setSpirteInfo(info);
+                _this.scene.setSpriteHover(sprite);
             } else if (circle != null) {
-                var color = circle.getColor().toString();
-                var colorrbg = color.split(",");
-                colorrbg.splice(-1, 1);
-                color = colorrbg.join(",");
-                var _info = "position: (" + circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   " + "Color: " + color;
-                _this.scene.setSpirteInfo(_info);
+                // let color : string = circle.getColor().toString();
+                // let colorrbg : Array<string> = color.split(",");
+                // colorrbg.splice(-1, 1);
+                // color = colorrbg.join(",");
+                // let info : string = "position: ("
+                //                 +   circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   "
+                //                 +   "Color: " + color;
+                // this.scene.setSpirteInfo(info);
+                _this.scene.setSpriteHover(circle);
             } else {
-                _this.scene.setSpirteInfo("");
+                _this.scene.setSpriteHover(null);
             }
         };
     }
@@ -2698,6 +2729,6 @@ var UIController = function () {
 
 exports.UIController = UIController;
 
-},{}]},{},[1])
+},{"../scene/sprite/CircleSprite":18}]},{},[1])
 
 //# sourceMappingURL=demo.js.map

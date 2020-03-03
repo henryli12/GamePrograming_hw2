@@ -13,14 +13,14 @@ export class SceneGraph {
     // SCENE GRAPH IS QUITE SIMPLE, SO THIS IS THE SAME AS
     // OUR LIST OF ANIMATED SPRITES
     private visibleSet : Array<SceneObject>;
-    private SpriteInfo : string;
+    private spriteHover : SceneObject;
 
     public constructor() {
         // DEFAULT CONSTRUCTOR INITIALIZES OUR DATA STRUCTURES
         this.animatedSprites = new Array();
         this.circleSprites = new Array();
         this.visibleSet = new Array();
-        this.SpriteInfo = "";
+        this.spriteHover = null;
     }
 
     public getNumSprites() : number {
@@ -90,10 +90,10 @@ export class SceneGraph {
         let index : number = this.circleSprites.indexOf(circle);
         this.circleSprites.splice(index, 1);
     }
-    public setSpirteInfo(SpriteInfo : string) : void{
-        this.SpriteInfo = SpriteInfo;
+    public setSpriteHover(spriteHover : SceneObject) : void{
+        this.spriteHover = spriteHover;
     }
-    public getSpriteInfo() : string{
-        return this.SpriteInfo;
+    public getSpriteHover() : SceneObject{
+        return this.spriteHover;
     }
 }

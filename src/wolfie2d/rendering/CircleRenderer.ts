@@ -12,9 +12,6 @@ var SpriteDefaults = {
     A_POSITION: "a_Position",
     A_TEX_COORD: "a_TexCoord",
     U_SPRITE_TRANSFORM: "u_SpriteTransform",
-    U_TEX_COORD_FACTOR: "u_TexCoordFactor",
-    U_TEX_COORD_SHIFT: "u_TexCoordShift",
-    U_SAMPLER: "u_Sampler",
     NUM_VERTICES: 4,
     FLOATS_PER_VERTEX: 2,
     FLOATS_PER_TEXTURE_COORDINATE: 2,
@@ -65,7 +62,7 @@ export class CircleRenderer {
             '        discard;\n'+
             '    }\n'+
             '    gl_FragColor =\n'+ 
-            '    vec4(1.0, 1.0, dist, alpha);\n'+
+            '    vec4(1.0, 0.0, dist, alpha);\n'+
             '}\n'
         
         this.shader.init(webGL, vertexShaderSource, fragmentShaderSource);

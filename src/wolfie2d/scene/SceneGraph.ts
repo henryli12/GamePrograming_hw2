@@ -1,11 +1,13 @@
 import {SceneObject} from './SceneObject'
 import {AnimatedSprite} from './sprite/AnimatedSprite'
+import { CircleSprite } from './sprite/CircleSprite';
 
 export class SceneGraph {
     // AND ALL OF THE ANIMATED SPRITES, WHICH ARE NOT STORED
     // SORTED OR IN ANY PARTICULAR ORDER. NOTE THAT ANIMATED SPRITES
     // ARE SCENE OBJECTS
     private animatedSprites : Array<AnimatedSprite>;
+    private circleSprites : Array<CircleSprite>;
 
     // SET OF VISIBLE OBJECTS, NOTE THAT AT THE MOMENT OUR
     // SCENE GRAPH IS QUITE SIMPLE, SO THIS IS THE SAME AS
@@ -16,24 +18,34 @@ export class SceneGraph {
     public constructor() {
         // DEFAULT CONSTRUCTOR INITIALIZES OUR DATA STRUCTURES
         this.animatedSprites = new Array();
+        this.circleSprites = new Array();
         this.visibleSet = new Array();
         this.SpriteInfo = "";
     }
 
     public getNumSprites() : number {
-        return this.animatedSprites.length;
+        return this.animatedSprites.length + this.circleSprites.length;
     }
 
     public addAnimatedSprite(sprite : AnimatedSprite) : void {
         this.animatedSprites.push(sprite);
     }
 
+    public addCircleSprite(circle : CircleSprite) : void{
+        this.circleSprites.push(circle);
+    }
     public getSpriteAt(testX : number, testY : number) : AnimatedSprite {
         for (let sprite of this.animatedSprites) {
             if (sprite.contains(testX, testY))
                 return sprite;
         }
         return null;
+    }
+    public getCircleAt(testX : number, testY : number) : CircleSprite {
+        for (let circle of this.circleSprites){
+            if(circle.contains(testX,testY))
+                return circle;
+        }
     }
 
     /**
@@ -62,9 +74,21 @@ export class SceneGraph {
 
         return this.visibleSet;
     }
+
+    public circleScope() : Array<SceneObject> {
+        this.visibleSet = [];
+        for (let circle of this.circleSprites){
+            this.visibleSet.push(circle);
+        }
+        return this.visibleSet;
+    }
     public remove(sprite : AnimatedSprite) : void{
         let index : number = this.animatedSprites.indexOf(sprite);
         this.animatedSprites.splice(index, 1);
+    }
+    public removeCircle(circle : CircleSprite) : void{
+        let index : number = this.circleSprites.indexOf(circle);
+        this.circleSprites.splice(index, 1);
     }
     public setSpirteInfo(SpriteInfo : string) : void{
         this.SpriteInfo = SpriteInfo;

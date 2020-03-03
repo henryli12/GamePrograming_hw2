@@ -5,11 +5,15 @@ import {TextRenderer} from './TextRenderer'
 import {WebGLGameSpriteRenderer} from './WebGLGameSpriteRenderer'
 import {AnimatedSprite} from '../scene/sprite/AnimatedSprite'
 import {WebGLGameTexture } from './WebGLGameTexture';
+import { CircleRenderer } from './CircleRenderer';
+import { CircleSprite } from '../scene/sprite/CircleSprite';
+import { Vector3 } from '../math/Vector3';
 
 export class WebGLGameRenderingSystem {
     private renderingCanvas : HTMLCanvasElement;
     private webGL : WebGLRenderingContext;
     private spriteRenderer : WebGLGameSpriteRenderer;
+    private circleRenderer : CircleRenderer;
     private textRenderer : TextRenderer;
     private canvasWidth : number;
     private canvasHeight : number;
@@ -77,7 +81,8 @@ export class WebGLGameRenderingSystem {
         // NOW MAKE THE SHADER FOR DRAWING THIS THING
         this.spriteRenderer = new WebGLGameSpriteRenderer();
         this.spriteRenderer.init(this.webGL);
-        
+        this.circleRenderer = new CircleRenderer();
+        this.circleRenderer.init(this.webGL);
         // THIS WILL STORE OUR TEXT
         this.textRenderer = new TextRenderer(textCanvasId, "serif", 18, "#FFFF00");
     }
@@ -115,13 +120,13 @@ export class WebGLGameRenderingSystem {
         this.webGL.clearColor(r, g, b, a);
     }
 
-    public render(visibleSet : Array<AnimatedSprite>) : void {
+    public render(visibleSet : Array<AnimatedSprite>, visibleCircles : Array<CircleSprite>) : void {
         // CLEAR THE CANVAS
         this.webGL.clear(this.webGL.COLOR_BUFFER_BIT | this.webGL.DEPTH_BUFFER_BIT);
         
         // RENDER THE SPRITES ON ONE CANVAS
         this.spriteRenderer.renderAnimatedSprites(this.webGL, this.canvasWidth, this.canvasHeight, visibleSet);
-        
+        this.circleRenderer.renderCircleSprites(this.webGL, this.canvasWidth, this.canvasHeight, visibleCircles);
         // THEN THE TEXT ON ANOTHER OVERLAPPING CANVAS
         this.textRenderer.render();
     }

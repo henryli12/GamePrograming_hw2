@@ -11,6 +11,7 @@ import {WebGLGameRenderingSystem} from '../wolfie2d/rendering/WebGLGameRendering
 import {SceneGraph} from '../wolfie2d/scene/SceneGraph'
 import {AnimatedSprite} from '../wolfie2d/scene/sprite/AnimatedSprite'
 import {AnimatedSpriteType} from '../wolfie2d/scene/sprite/AnimatedSpriteType'
+import { CircleSprite } from '../wolfie2d/scene/sprite/CircleSprite'
 
 // IN THIS EXAMPLE WE'LL HAVE 2 SPRITE TYPES THAT EACH HAVE THE SAME 2 STATES
 // AND WHERE EACH SPRITE TYPE HAS ITS OWN SPRITE SHEET
@@ -75,6 +76,13 @@ class AnimatedSpriteDemo {
                 spriteToAdd.getPosition().set(randomX, randomY, 0.0, 1.0);
                 scene.addAnimatedSprite(spriteToAdd);
             }
+        }
+        for (let z = 0; z < 5; z++){
+            let circle : CircleSprite = new CircleSprite();
+            let randomX : number = Math.floor(Math.random() * canvasWidth) - (circle.getWidth()/2);
+            let randomY : number = Math.floor(Math.random() * canvasHeight) - (circle.getHeight()/2);
+            circle.getPosition().set(randomX, randomY, 0.0, 1.0);
+            scene.addCircleSprite(circle);
         }
     }
 

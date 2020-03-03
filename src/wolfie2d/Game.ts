@@ -10,6 +10,7 @@ import {SceneGraph} from './scene/SceneGraph'
 import {AnimatedSprite} from './scene/sprite/AnimatedSprite'
 import {ResourceManager} from './files/ResourceManager'
 import {UIController} from './ui/UIController'
+import { CircleSprite } from './scene/sprite/CircleSprite'
 
 export class Game extends GameLoopTemplate {
     private resourceManager : ResourceManager = new ResourceManager();
@@ -49,9 +50,11 @@ export class Game extends GameLoopTemplate {
         // GET THE VISIBLE SET FROM THE SCENE GRAPH
         let visibleSprites : Array<AnimatedSprite>;
         visibleSprites = <Array<AnimatedSprite>>this.sceneGraph.scope();
+        let visibleCircles : Array<CircleSprite>;
+        visibleCircles = <Array<CircleSprite>>this.sceneGraph.circleScope();
 
         // RENDER THE VISIBLE SET, WHICH SHOULD ALL BE RENDERABLE
-        this.renderingSystem.render(visibleSprites);
+        this.renderingSystem.render(visibleSprites, visibleCircles);
     }
 
     /**

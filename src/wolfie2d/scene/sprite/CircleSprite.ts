@@ -1,14 +1,15 @@
 import {SceneObject} from '../SceneObject'
 import { Vector3 } from '../../math/Vector3';
 export class CircleSprite extends SceneObject {
-    private color : Vector3;
+    private color : Array<number>;
     private width : number;
     private height : number;
-    public constructor(color : Vector3, width : number, height : number){
+    public constructor(){
         super();
-        this.width = width;
-        this.height = height;
-        this.color = color;
+        this.width = 256;
+        this.height = 256;
+        this.color = [255.0,255.0,255.0,1.0];
+
     }
     public contains(pointX : number, pointY : number) : boolean {
         let spriteWidth = this.width;
@@ -27,7 +28,7 @@ export class CircleSprite extends SceneObject {
             return true;
         }
     }
-    public getColor() : Vector3{
+    public getColor() : Array<number>{
         return this.color;
     }
     public getWidth() : number{

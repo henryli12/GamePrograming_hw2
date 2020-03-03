@@ -94,7 +94,7 @@ class AnimatedSpriteDemo {
         let numSpritesText = new TextToRender("Num Sprites", "", 20, 50, function() {
             numSpritesText.text = "Number of Sprites: " + sceneGraph.getNumSprites();
         });
-        let spriteInfo = new TextToRender("Sprite Info", "", 20, 90, function(){
+        let spriteInfo = new TextToRender("Sprite Info", "", 20, 70, function(){
             spriteInfo.text = game.getSceneGraph().getSpriteInfo();
         });
         let textRenderer = game.getRenderingSystem().getTextRenderer();

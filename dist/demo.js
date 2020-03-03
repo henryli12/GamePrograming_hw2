@@ -96,7 +96,7 @@ var AnimatedSpriteDemo = function () {
             var numSpritesText = new TextRenderer_1.TextToRender("Num Sprites", "", 20, 50, function () {
                 numSpritesText.text = "Number of Sprites: " + sceneGraph.getNumSprites();
             });
-            var spriteInfo = new TextRenderer_1.TextToRender("Sprite Info", "", 20, 90, function () {
+            var spriteInfo = new TextRenderer_1.TextToRender("Sprite Info", "", 20, 70, function () {
                 spriteInfo.text = game.getSceneGraph().getSpriteInfo();
             });
             var textRenderer = game.getRenderingSystem().getTextRenderer();
@@ -2441,7 +2441,7 @@ var AnimatedSprite = function (_SceneObject_1$SceneO) {
     }, {
         key: "toString",
         value: function toString() {
-            var summary = "position: (" + this.getPosition().getX() + ", " + this.getPosition().getY() + ") " + "(state: " + this.getState() + ") " + "(animationFrameIndex: " + this.getAnimationFrameIndex() + ") " + "(frameCounter: " + this.getFrameCounter() + ") ";
+            var summary = "{ position: (" + this.getPosition().getX() + ", " + this.getPosition().getY() + ") " + "(state: " + this.getState() + ") " + "(animationFrameIndex: " + this.getAnimationFrameIndex() + ") " + "(frameCounter: " + this.getFrameCounter() + ") ";
             return summary;
         }
     }]);
@@ -2660,13 +2660,17 @@ var UIController = function () {
             var mousePressX = event.clientX;
             var mousePressY = event.clientY;
             var sprite = _this.scene.getSpriteAt(mousePressX, mousePressY);
+            var circle = _this.scene.getCircleAt(mousePressX, mousePressY);
             if (sprite != null) {
-                // let info : string = "position: (" 
-                //                 +   sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + "\n"
-                //                 +   "State: " + sprite.getState() + ")\n"
-                //                 +   "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "\n"
-                //                 +   "Frame Count: " + sprite.getFrameCounter();
-                _this.scene.setSpirteInfo(sprite.toString());
+                var info = "position: (" + sprite.getPosition().getX() + ", " + sprite.getPosition().getY() + ")   " + "State: " + sprite.getState() + "   " + "Animation Frame Index: " + sprite.getAnimationFrameIndex() + "   " + "Frame Count: " + sprite.getFrameCounter();
+                _this.scene.setSpirteInfo(info);
+            } else if (circle != null) {
+                var color = circle.getColor().toString();
+                var colorrbg = color.split(",");
+                colorrbg.splice(-1, 1);
+                color = colorrbg.join(",");
+                var _info = "position: (" + circle.getPosition().getX() + ", " + circle.getPosition().getY() + ")   " + "Color: " + color;
+                _this.scene.setSpirteInfo(_info);
             } else {
                 _this.scene.setSpirteInfo("");
             }

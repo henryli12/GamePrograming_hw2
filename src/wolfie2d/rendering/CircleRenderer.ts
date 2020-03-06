@@ -8,19 +8,19 @@ import {WebGLGameTexture} from './WebGLGameTexture'
 import {HashTable} from '../data/HashTable'
 import { CircleSprite } from '../scene/sprite/CircleSprite'
 
-var SpriteDefaults = {
+var CircleDefaults = {
     A_POSITION: "a_Position",
-    A_TEX_COORD: "a_TexCoord",
+    A_VALUE_TO_INTERPOLATE: "a_ValueToInterpolate",
     U_SPRITE_TRANSFORM: "u_SpriteTransform",
+    U_R: "u_r",
+    U_G: "u_g",
+    U_B: "u_b",
     NUM_VERTICES: 4,
     FLOATS_PER_VERTEX: 2,
     FLOATS_PER_TEXTURE_COORDINATE: 2,
-    TOTAL_BYTES: 16,
-    VERTEX_POSITION_OFFSET: 0,
-    TEXTURE_COORDINATE_OFFSET: 8,
+    OFFSET: 0,
+    STRIDE: 0,
     INDEX_OF_FIRST_VERTEX: 0,
-    A_VALUE_TO_INTERPOLATE: "a_ValueToInterpolate",
-    VAL: "val"
 };
 
 export class CircleRenderer {
@@ -41,37 +41,36 @@ export class CircleRenderer {
         this.shader = new WebGLGameShader();
         var vertexShaderSource =
             'precision highp float;\n'+
-            'attribute vec4 a_Position;\n'+
-            'attribute vec2 a_ValueToInterpolate;\n'+
+            'attribute vec4 ' + CircleDefaults.A_POSITION + ';\n'+
+            'attribute vec2 ' + CircleDefaults.A_VALUE_TO_INTERPOLATE + ';\n'+
             'varying vec2 val;\n'+
-            'uniform mat4 u_SpriteTransform;\n'+
+            'uniform mat4 ' + CircleDefaults.U_SPRITE_TRANSFORM +';\n'+
             'void main() {\n'+
-            '    val = a_ValueToInterpolate;\n'+
-            '    gl_Position = u_SpriteTransform\n'+ 
-            '            * a_Position;\n'+
+            '    val = ' + CircleDefaults.A_VALUE_TO_INTERPOLATE +' * 2.0 ;\n'+
+            '  gl_Position = ' + CircleDefaults.U_SPRITE_TRANSFORM + ' * ' + CircleDefaults.A_POSITION + ';\n' +
             '}\n'
         
         var fragmentShaderSource =
             'precision highp float;\n'+
             'varying vec2 val;\n'+
-            'uniform float u_r;\n'+
-            'uniform float u_g;\n'+
-            'uniform float u_b;\n'+
+            'uniform float ' + CircleDefaults.U_R + ';\n'+
+            'uniform float ' + CircleDefaults.U_G + ';\n'+
+            'uniform float ' + CircleDefaults.U_B + ';\n'+
             'void main() {\n'+
-            '    float R = 0.5;\n'+
+            '    float R = 1.0;\n'+
             '    float dist = sqrt(dot(val,val));\n'+
             '    float alpha = 1.0;\n'+
             '    if (dist > R) {\n'+
             '        discard;\n'+
             '    }\n'+
             '    if (u_r == 0.0){\n'+
-            '        gl_FragColor = vec4(dist, u_g, u_b, alpha);\n'+
+            '        gl_FragColor = vec4(dist, ' + CircleDefaults.U_G + ' + dist, ' + CircleDefaults.U_B + ' + dist, alpha);\n'+
             '    }\n'+
             '    if(u_g == 0.0){\n'+
-            '        gl_FragColor = vec4(u_r, dist, u_b, alpha);\n'+
+            '        gl_FragColor = vec4( ' + CircleDefaults.U_R + ', dist, ' + CircleDefaults.U_B +', alpha);\n'+
             '    }\n'+
             '    if(u_b == 0.0){\n'+
-            '        gl_FragColor = vec4(u_r, u_g, dist, alpha);\n'+
+            '        gl_FragColor = vec4('+CircleDefaults.U_R +', ' + CircleDefaults.U_G + ', dist, alpha);\n'+
             '    }\n'+
             '}\n'
         
@@ -143,10 +142,10 @@ export class CircleRenderer {
         webGL.bindBuffer(webGL.ARRAY_BUFFER, this.vertexTexCoordBuffer);
 
         let a_PositionLocation : GLuint = this.webGLAttributeLocations["a_Position"];
-        webGL.vertexAttribPointer(a_PositionLocation, 2, webGL.FLOAT, false, 0, 0);
+        webGL.vertexAttribPointer(a_PositionLocation, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
         webGL.enableVertexAttribArray(a_PositionLocation);
         let a_ValueToInterpolate : GLuint = this.webGLAttributeLocations["a_ValueToInterpolate"];
-        webGL.vertexAttribPointer(a_ValueToInterpolate, 2, webGL.FLOAT, false, 0, 0);
+        webGL.vertexAttribPointer(a_ValueToInterpolate, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
         webGL.enableVertexAttribArray(a_ValueToInterpolate);
 
         let u_SpriteTransform : WebGLUniformLocation = this.webGLUniformLocations["u_SpriteTransform"];
@@ -160,7 +159,7 @@ export class CircleRenderer {
 
 
         // DRAW THE SPRITE AS A TRIANGLE STRIP USING 4 VERTICES, STARTING AT THE START OF THE ARRAY (index 0)
-        webGL.drawArrays(webGL.TRIANGLE_STRIP, SpriteDefaults.INDEX_OF_FIRST_VERTEX, SpriteDefaults.NUM_VERTICES);
+        webGL.drawArrays(webGL.TRIANGLE_STRIP, CircleDefaults.INDEX_OF_FIRST_VERTEX, CircleDefaults.NUM_VERTICES);
     }
 
     public renderCircleSprites(webGL : WebGLRenderingContext, 

@@ -1472,7 +1472,6 @@ var CircleDefaults = {
     NUM_VERTICES: 4,
     FLOATS_PER_VERTEX: 2,
     FLOATS_PER_TEXTURE_COORDINATE: 2,
-    TOTAL_BYTES: 16,
     OFFSET: 0,
     STRIDE: 0,
     INDEX_OF_FIRST_VERTEX: 0
@@ -1488,7 +1487,7 @@ var CircleRenderer = function () {
         value: function init(webGL) {
             this.shader = new WebGLGameShader_1.WebGLGameShader();
             var vertexShaderSource = 'precision highp float;\n' + 'attribute vec4 ' + CircleDefaults.A_POSITION + ';\n' + 'attribute vec2 ' + CircleDefaults.A_VALUE_TO_INTERPOLATE + ';\n' + 'varying vec2 val;\n' + 'uniform mat4 ' + CircleDefaults.U_SPRITE_TRANSFORM + ';\n' + 'void main() {\n' + '    val = ' + CircleDefaults.A_VALUE_TO_INTERPOLATE + ' * 2.0 ;\n' + '  gl_Position = ' + CircleDefaults.U_SPRITE_TRANSFORM + ' * ' + CircleDefaults.A_POSITION + ';\n' + '}\n';
-            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'uniform float ' + CircleDefaults.U_R + ';\n' + 'uniform float ' + CircleDefaults.U_G + ';\n' + 'uniform float ' + CircleDefaults.U_B + ';\n' + 'void main() {\n' + '    float R = 1.0;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    if (u_r == 0.0){\n' + '        gl_FragColor = vec4(dist, ' + CircleDefaults.U_G + ' + dist, ' + CircleDefaults.U_B + ' + dist, alpha);\n' + '    }\n' + '    if(u_g == 0.0){\n' + '        gl_FragColor = vec4( ' + CircleDefaults.U_R + ', dist, ' + CircleDefaults.U_B + ', alpha);\n' + '    }\n' + '    if(u_b == 0.0){\n' + '        gl_FragColor = vec4(' + CircleDefaults.U_R + ', ' + CircleDefaults.U_G + ', dist, alpha);\n' + '    }\n' + '}\n';
+            var fragmentShaderSource = 'precision highp float;\n' + 'varying vec2 val;\n' + 'uniform float ' + CircleDefaults.U_R + ';\n' + 'uniform float ' + CircleDefaults.U_G + ';\n' + 'uniform float ' + CircleDefaults.U_B + ';\n' + 'void main() {\n' + '    float R = 1.0;\n' + '    float dist = sqrt(dot(val,val));\n' + '    float alpha = 1.0;\n' + '    if (dist > R) {\n' + '        discard;\n' + '    }\n' + '    if (u_r == 0.0){\n' + '        gl_FragColor = vec4(dist, ' + CircleDefaults.U_G + '* 100.0 + dist, ' + CircleDefaults.U_B + '*100.0 + dist, alpha);\n' + '    }\n' + '    if(u_g == 0.0){\n' + '        gl_FragColor = vec4( ' + CircleDefaults.U_R + ' *100.0+ dist, dist, ' + CircleDefaults.U_B + '*100.0 + dist, alpha);\n' + '    }\n' + '    if(u_b == 0.0){\n' + '        gl_FragColor = vec4(' + CircleDefaults.U_R + '*100.0 + dist, ' + CircleDefaults.U_G + '*100.0 + dist, dist, alpha);\n' + '    }\n' + '}\n';
             this.shader.init(webGL, vertexShaderSource, fragmentShaderSource);
             // GET THE webGL OBJECT TO USE
             var verticesTexCoords = new Float32Array([-0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5]);
@@ -1501,8 +1500,8 @@ var CircleRenderer = function () {
             // SETUP THE SHADER ATTRIBUTES AND UNIFORMS
             this.webGLAttributeLocations = {};
             this.webGLUniformLocations = {};
-            this.loadAttributeLocations(webGL, ["a_Position", "a_ValueToInterpolate"]);
-            this.loadUniformLocations(webGL, ["u_SpriteTransform", "u_r", "u_g", "u_b"]);
+            this.loadAttributeLocations(webGL, [CircleDefaults.A_POSITION, CircleDefaults.A_VALUE_TO_INTERPOLATE]);
+            this.loadUniformLocations(webGL, [CircleDefaults.U_B, CircleDefaults.U_G, CircleDefaults.U_R, CircleDefaults.U_SPRITE_TRANSFORM]);
             // WE'LL USE THESE FOR TRANSOFMRING OBJECTS WHEN WE DRAW THEM
             this.spriteTransform = new Matrix_1.Matrix(4, 4);
             this.spriteTranslate = new Vector3_1.Vector3();
@@ -1547,19 +1546,19 @@ var CircleRenderer = function () {
             MathUtilities_1.MathUtilities.identity(this.spriteTransform);
             MathUtilities_1.MathUtilities.model(this.spriteTransform, this.spriteTranslate, this.spriteRotate, this.spriteScale);
             webGL.bindBuffer(webGL.ARRAY_BUFFER, this.vertexTexCoordBuffer);
-            var a_PositionLocation = this.webGLAttributeLocations["a_Position"];
-            webGL.vertexAttribPointer(a_PositionLocation, 2, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
+            var a_PositionLocation = this.webGLAttributeLocations[CircleDefaults.A_POSITION];
+            webGL.vertexAttribPointer(a_PositionLocation, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
             webGL.enableVertexAttribArray(a_PositionLocation);
-            var a_ValueToInterpolate = this.webGLAttributeLocations["a_ValueToInterpolate"];
-            webGL.vertexAttribPointer(a_ValueToInterpolate, 2, webGL.FLOAT, false, 0, CircleDefaults.OFFSET);
+            var a_ValueToInterpolate = this.webGLAttributeLocations[CircleDefaults.A_VALUE_TO_INTERPOLATE];
+            webGL.vertexAttribPointer(a_ValueToInterpolate, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
             webGL.enableVertexAttribArray(a_ValueToInterpolate);
-            var u_SpriteTransform = this.webGLUniformLocations["u_SpriteTransform"];
+            var u_SpriteTransform = this.webGLUniformLocations[CircleDefaults.U_SPRITE_TRANSFORM];
             webGL.uniformMatrix4fv(u_SpriteTransform, false, this.spriteTransform.getData());
-            var u_r = this.webGLUniformLocations["u_r"];
+            var u_r = this.webGLUniformLocations[CircleDefaults.U_R];
             webGL.uniform1f(u_r, circle.getR());
-            var u_g = this.webGLUniformLocations["u_g"];
+            var u_g = this.webGLUniformLocations[CircleDefaults.U_G];
             webGL.uniform1f(u_g, circle.getG());
-            var u_b = this.webGLUniformLocations["u_b"];
+            var u_b = this.webGLUniformLocations[CircleDefaults.U_B];
             webGL.uniform1f(u_b, circle.getB());
             // DRAW THE SPRITE AS A TRIANGLE STRIP USING 4 VERTICES, STARTING AT THE START OF THE ARRAY (index 0)
             webGL.drawArrays(webGL.TRIANGLE_STRIP, CircleDefaults.INDEX_OF_FIRST_VERTEX, CircleDefaults.NUM_VERTICES);

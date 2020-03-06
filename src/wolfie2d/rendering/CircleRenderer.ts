@@ -64,13 +64,13 @@ export class CircleRenderer {
             '        discard;\n'+
             '    }\n'+
             '    if (u_r == 0.0){\n'+
-            '        gl_FragColor = vec4(dist, ' + CircleDefaults.U_G + ' + dist, ' + CircleDefaults.U_B + ' + dist, alpha);\n'+
+            '        gl_FragColor = vec4(dist, ' + CircleDefaults.U_G + '* 100.0 + dist, ' + CircleDefaults.U_B + '*100.0 + dist, alpha);\n'+
             '    }\n'+
             '    if(u_g == 0.0){\n'+
-            '        gl_FragColor = vec4( ' + CircleDefaults.U_R + ', dist, ' + CircleDefaults.U_B +', alpha);\n'+
+            '        gl_FragColor = vec4( ' + CircleDefaults.U_R + ' *100.0+ dist, dist, ' + CircleDefaults.U_B +'*100.0 + dist, alpha);\n'+
             '    }\n'+
             '    if(u_b == 0.0){\n'+
-            '        gl_FragColor = vec4('+CircleDefaults.U_R +', ' + CircleDefaults.U_G + ', dist, alpha);\n'+
+            '        gl_FragColor = vec4('+CircleDefaults.U_R +'*100.0 + dist, ' + CircleDefaults.U_G + '*100.0 + dist, dist, alpha);\n'+
             '    }\n'+
             '}\n'
         
@@ -94,8 +94,8 @@ export class CircleRenderer {
         // SETUP THE SHADER ATTRIBUTES AND UNIFORMS
         this.webGLAttributeLocations = {};
         this.webGLUniformLocations = {};
-        this.loadAttributeLocations(webGL, ["a_Position", "a_ValueToInterpolate"]);
-        this.loadUniformLocations(webGL, ["u_SpriteTransform", "u_r", "u_g", "u_b"]);
+        this.loadAttributeLocations(webGL, [CircleDefaults.A_POSITION, CircleDefaults.A_VALUE_TO_INTERPOLATE]);
+        this.loadUniformLocations(webGL, [CircleDefaults.U_B, CircleDefaults.U_G, CircleDefaults.U_R, CircleDefaults.U_SPRITE_TRANSFORM]);
 
         // WE'LL USE THESE FOR TRANSOFMRING OBJECTS WHEN WE DRAW THEM
         this.spriteTransform = new Matrix(4, 4);
@@ -141,20 +141,20 @@ export class CircleRenderer {
         
         webGL.bindBuffer(webGL.ARRAY_BUFFER, this.vertexTexCoordBuffer);
 
-        let a_PositionLocation : GLuint = this.webGLAttributeLocations["a_Position"];
+        let a_PositionLocation : GLuint = this.webGLAttributeLocations[CircleDefaults.A_POSITION];
         webGL.vertexAttribPointer(a_PositionLocation, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
         webGL.enableVertexAttribArray(a_PositionLocation);
-        let a_ValueToInterpolate : GLuint = this.webGLAttributeLocations["a_ValueToInterpolate"];
+        let a_ValueToInterpolate : GLuint = this.webGLAttributeLocations[CircleDefaults.A_VALUE_TO_INTERPOLATE];
         webGL.vertexAttribPointer(a_ValueToInterpolate, CircleDefaults.FLOATS_PER_VERTEX, webGL.FLOAT, false, CircleDefaults.STRIDE, CircleDefaults.OFFSET);
         webGL.enableVertexAttribArray(a_ValueToInterpolate);
 
-        let u_SpriteTransform : WebGLUniformLocation = this.webGLUniformLocations["u_SpriteTransform"];
+        let u_SpriteTransform : WebGLUniformLocation = this.webGLUniformLocations[CircleDefaults.U_SPRITE_TRANSFORM];
         webGL.uniformMatrix4fv(u_SpriteTransform, false, this.spriteTransform.getData());
-        let u_r : WebGLUniformLocation = this.webGLUniformLocations["u_r"];
+        let u_r : WebGLUniformLocation = this.webGLUniformLocations[CircleDefaults.U_R];
         webGL.uniform1f(u_r, circle.getR());
-        let u_g : WebGLUniformLocation = this.webGLUniformLocations["u_g"];
+        let u_g : WebGLUniformLocation = this.webGLUniformLocations[CircleDefaults.U_G];
         webGL.uniform1f(u_g, circle.getG());
-        let u_b : WebGLUniformLocation = this.webGLUniformLocations["u_b"];
+        let u_b : WebGLUniformLocation = this.webGLUniformLocations[CircleDefaults.U_B];
         webGL.uniform1f(u_b, circle.getB());
 
 
